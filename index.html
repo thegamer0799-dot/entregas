@@ -4,1789 +4,1352 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#172554">
 <title>Controle de Entregas</title>
-<meta name="description" content="Controle de entregas, clientes e histórico de registros.">
-<meta name="theme-color" content="#2f5fd0">
-<meta name="application-name" content="Controle de Entregas">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Entregas">
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="description" content="Sistema de controle e gerenciamento de entregas">
 
 <style>
 :root {
-    --bg:#f4f7fb;
-    --surface:#fff;
-    --surface-2:#f9fbfe;
-    --border:#e2e9f2;
-    --border-strong:#cdd8e6;
-    --text:#16202e;
-    --muted:#667a92;
-    --primary:#2f5fd0;
-    --primary-dark:#1f47a8;
-    --primary-soft:#e8efff;
-    --success:#1f8a54;
-    --success-soft:#e3f6ec;
-    --warning:#b06a00;
-    --warning-soft:#fdf1dc;
-    --danger:#c33b3b;
-    --danger-soft:#fde7e7;
-    --radius:16px;
-    --shadow:0 6px 18px -6px rgba(20,35,60,.12);
+  --primary: #1e3a8a;
+  --primary-dark: #172554;
+  --primary-light: #eff6ff;
+  --success: #15803d;
+  --success-light: #f0fdf4;
+  --warning: #b45309;
+  --warning-light: #fffbeb;
+  --danger: #b91c1c;
+  --danger-light: #fef2f2;
+  --background: #f4f6fb;
+  --surface: #ffffff;
+  --text: #172033;
+  --muted: #64748b;
+  --border: #e2e8f0;
+  --radius: 14px;
+  --shadow: 0 4px 18px rgba(15, 23, 42, .06);
 }
 
-* {margin:0;padding:0;box-sizing:border-box}
+* {
+  box-sizing: border-box;
+}
 
 body {
-    min-height:100vh;
-    padding:clamp(14px,3vw,35px);
-    font-family:Inter,"Segoe UI",system-ui,sans-serif;
-    color:var(--text);
-    background:var(--bg);
-    background-image:
-        radial-gradient(circle at 0% 0%,#e6eeff 0%,transparent 45%),
-        radial-gradient(circle at 100% 100%,#eaf3ff 0%,transparent 40%);
-    line-height:1.5;
+  margin: 0;
+  background: var(--background);
+  color: var(--text);
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
-button,input,select {font:inherit}
-
-button:focus-visible,input:focus-visible,select:focus-visible {
-    outline:3px solid #8baaff;
-    outline-offset:2px;
+button, input, select {
+  font: inherit;
 }
 
-.app {
-    max-width:1200px;
-    width:100%;
-    margin:auto;
-    display:flex;
-    flex-direction:column;
-    gap:22px;
+button {
+  cursor: pointer;
 }
 
-/* CABEÇALHO E LOGO ORIGINAL */
+.topbar {
+  background: linear-gradient(120deg, var(--primary-dark), var(--primary));
+  color: white;
+  padding: 22px 20px;
+}
 
-.header {
-    display:flex;
-    align-items:center;
-    gap:15px;
+.topbar-content {
+  max-width: 1100px;
+  margin: auto;
+  display: flex;
+  align-items: center;
+  gap: 14px;
 }
 
 .logo-mark {
-    width:52px;
-    height:52px;
-    flex-shrink:0;
-    border-radius:16px;
-    background:linear-gradient(140deg,var(--primary),var(--primary-dark));
-    display:grid;
-    place-items:center;
-    color:#fff;
-    box-shadow:var(--shadow);
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: rgba(255,255,255,.12);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
 }
 
 .logo-mark svg {
-    width:28px;
-    height:28px;
+  width: 27px;
+  height: 27px;
 }
 
-.header h1 {
-    font-size:clamp(1.35rem,3vw,1.8rem);
-    line-height:1.2;
-    letter-spacing:-.02em;
+.brand h1 {
+  margin: 0;
+  font-size: 21px;
+  font-weight: 750;
 }
 
-.header p {
-    color:var(--muted);
-    font-size:.9rem;
+.brand p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: rgba(255,255,255,.75);
 }
 
-/* CARTÕES */
-
-.card {
-    background:var(--surface);
-    border:1px solid var(--border);
-    border-radius:20px;
-    box-shadow:0 1px 2px rgba(20,35,60,.05);
+.container {
+  width: min(1100px, calc(100% - 32px));
+  margin: 24px auto 50px;
 }
-
-.form-card {
-    padding:clamp(18px,3vw,28px);
-    box-shadow:var(--shadow);
-}
-
-.form-row {
-    display:grid;
-    grid-template-columns:1fr 1fr auto;
-    gap:16px;
-    align-items:end;
-}
-
-.field {
-    display:flex;
-    flex-direction:column;
-    gap:6px;
-    min-width:0;
-}
-
-.field label {
-    font-size:.75rem;
-    font-weight:700;
-    text-transform:uppercase;
-    letter-spacing:.05em;
-    color:var(--muted);
-    padding-left:4px;
-}
-
-.input-wrap input {
-    width:100%;
-    height:48px;
-    padding:0 13px;
-    border:1.5px solid var(--border);
-    border-radius:12px;
-    background:var(--surface-2);
-    outline:none;
-    color:var(--text);
-    font-size:.95rem;
-}
-
-.input-wrap input:focus,
-.search-wrap input:focus,
-.sort-wrap select:focus {
-    border-color:var(--primary);
-    box-shadow:0 0 0 3px var(--primary-soft);
-}
-
-/* BOTÕES */
-
-.btn {
-    min-height:42px;
-    padding:0 15px;
-    display:inline-flex;
-    justify-content:center;
-    align-items:center;
-    gap:8px;
-    border:1px solid transparent;
-    border-radius:11px;
-    cursor:pointer;
-    font-size:.85rem;
-    font-weight:700;
-    transition:.18s;
-    white-space:nowrap;
-}
-
-.btn svg {
-    width:18px;
-    height:18px;
-    flex-shrink:0;
-}
-
-.btn-primary {
-    height:48px;
-    background:var(--primary);
-    color:white;
-}
-
-.btn-primary:hover {background:var(--primary-dark)}
-
-.btn-secondary {
-    background:white;
-    border-color:var(--border);
-    color:var(--muted);
-}
-
-.btn-secondary:hover {
-    background:var(--surface-2);
-    border-color:var(--border-strong);
-}
-
-/* BARRA DE FERRAMENTAS */
-
-.toolbar {
-    display:flex;
-    align-items:center;
-    gap:10px;
-    flex-wrap:wrap;
-    padding:13px;
-    background:white;
-    border:1px solid var(--border);
-    border-radius:14px;
-    box-shadow:0 1px 2px rgba(20,35,60,.05);
-}
-
-.search-wrap {
-    position:relative;
-    flex:1 1 190px;
-}
-
-.search-wrap svg {
-    position:absolute;
-    left:12px;
-    top:12px;
-    width:18px;
-    height:18px;
-    color:var(--muted);
-    pointer-events:none;
-}
-
-.search-wrap input {
-    width:100%;
-    height:42px;
-    padding:0 12px 0 38px;
-    background:var(--surface-2);
-    border:1.5px solid var(--border);
-    border-radius:10px;
-    outline:none;
-}
-
-.segment {
-    display:flex;
-    gap:3px;
-    padding:3px;
-    border:1px solid var(--border);
-    border-radius:10px;
-    background:var(--surface-2);
-}
-
-.segment button {
-    padding:8px 11px;
-    border:0;
-    border-radius:8px;
-    background:transparent;
-    color:var(--muted);
-    font-size:.8rem;
-    font-weight:700;
-    cursor:pointer;
-    white-space:nowrap;
-}
-
-.segment button.active {
-    background:white;
-    color:var(--primary);
-    box-shadow:0 1px 3px #00000012;
-}
-
-.sort-wrap {
-    display:flex;
-    align-items:center;
-    gap:7px;
-    color:var(--muted);
-    font-size:.85rem;
-}
-
-.sort-wrap label {font-weight:700}
-
-.sort-wrap select {
-    max-width:190px;
-    height:40px;
-    padding:0 9px;
-    border:1.5px solid var(--border);
-    border-radius:9px;
-    background:var(--surface-2);
-    outline:none;
-    color:var(--text);
-    font-size:.8rem;
-}
-
-.spacer {flex:1}
-
-/* TÍTULOS DAS SEÇÕES */
-
-.section-heading {
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:12px;
-    flex-wrap:wrap;
-    padding:17px 20px;
-    border-bottom:1px solid var(--border);
-    background:var(--surface-2);
-}
-
-.section-title {
-    display:flex;
-    align-items:center;
-    gap:11px;
-}
-
-.section-title svg {
-    width:22px;
-    height:22px;
-    color:var(--primary);
-}
-
-.section-title h2 {
-    font-size:1rem;
-    font-weight:750;
-}
-
-.section-title p {
-    font-size:.78rem;
-    color:var(--muted);
-}
-
-.count {
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    min-width:29px;
-    height:27px;
-    padding:0 8px;
-    border-radius:20px;
-    background:var(--primary-soft);
-    color:var(--primary);
-    font-size:.78rem;
-    font-weight:800;
-}
-
-.count-success {
-    background:var(--success-soft);
-    color:var(--success);
-}
-
-/* LISTAS */
-
-.list-card {overflow:hidden}
-
-.list-header,.row {
-    display:grid;
-    grid-template-columns:1.6fr 1fr 125px 185px;
-    gap:12px;
-    align-items:center;
-}
-
-.list-header {
-    padding:13px 20px;
-    background:var(--surface-2);
-    border-bottom:1px solid var(--border);
-    color:var(--muted);
-    font-size:.7rem;
-    font-weight:800;
-    text-transform:uppercase;
-    letter-spacing:.06em;
-}
-
-.row {
-    padding:14px 20px;
-    border-bottom:1px solid var(--border);
-    transition:background .15s;
-}
-
-.row:last-child {border-bottom:0}
-.row:hover {background:var(--surface-2)}
-
-.cell-client {
-    display:flex;
-    align-items:center;
-    gap:11px;
-    min-width:0;
-}
-
-.avatar {
-    width:39px;
-    height:39px;
-    flex-shrink:0;
-    display:grid;
-    place-items:center;
-    border-radius:11px;
-    background:var(--primary-soft);
-    color:var(--primary);
-    font-size:.85rem;
-    font-weight:800;
-    text-transform:uppercase;
-}
-
-.avatar-done {
-    background:var(--success-soft);
-    color:var(--success);
-}
-
-.client-info {
-    display:flex;
-    flex-direction:column;
-    min-width:0;
-}
-
-.client-name {
-    font-size:.92rem;
-    font-weight:700;
-    overflow:hidden;
-    text-overflow:ellipsis;
-    white-space:nowrap;
-}
-
-.client-detail {
-    font-size:.73rem;
-    color:var(--muted);
-}
-
-.cell-date {
-    color:var(--muted);
-    font-size:.86rem;
-    font-variant-numeric:tabular-nums;
-}
-
-.date-label {
-    display:block;
-    color:var(--muted);
-    font-size:.69rem;
-    margin-bottom:2px;
-}
-
-.badge {
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    padding:6px 10px;
-    border-radius:30px;
-    font-size:.73rem;
-    font-weight:800;
-    white-space:nowrap;
-}
-
-.badge-pendente {background:var(--primary-soft);color:var(--primary)}
-.badge-hoje {background:var(--warning-soft);color:var(--warning)}
-.badge-atrasado {background:var(--danger-soft);color:var(--danger)}
-.badge-entregue {background:var(--success-soft);color:var(--success)}
-
-.cell-action {
-    display:flex;
-    align-items:center;
-    justify-content:flex-end;
-    gap:6px;
-}
-
-.btn-entregar {
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    gap:6px;
-    min-height:36px;
-    padding:7px 11px;
-    border:0;
-    border-radius:9px;
-    background:var(--success-soft);
-    color:var(--success);
-    font-size:.75rem;
-    font-weight:800;
-    cursor:pointer;
-    white-space:nowrap;
-}
-
-.btn-entregar:hover {
-    background:var(--success);
-    color:white;
-}
-
-.btn-entregar svg {
-    width:16px;
-    height:16px;
-}
-
-.btn-icon {
-    width:36px;
-    height:36px;
-    display:grid;
-    place-items:center;
-    border:1px solid transparent;
-    border-radius:9px;
-    background:transparent;
-    color:var(--muted);
-    cursor:pointer;
-}
-
-.btn-icon svg {
-    width:17px;
-    height:17px;
-}
-
-.btn-icon:hover {
-    color:var(--danger);
-    background:var(--danger-soft);
-}
-
-.btn-restore:hover {
-    color:var(--success);
-    background:var(--success-soft);
-}
-
-/* LISTA VAZIA */
-
-.empty {
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    gap:10px;
-    padding:48px 20px;
-    text-align:center;
-}
-
-.empty-icon {
-    width:55px;
-    height:55px;
-    display:grid;
-    place-items:center;
-    border-radius:15px;
-    background:var(--surface-2);
-    color:var(--muted);
-}
-
-.empty-icon svg {
-    width:27px;
-    height:27px;
-}
-
-.empty h3 {font-size:1rem}
-
-.empty p {
-    max-width:350px;
-    color:var(--muted);
-    font-size:.85rem;
-}
-
-/* RESUMO */
 
 .stats {
-    display:flex;
-    flex-wrap:wrap;
-    align-items:center;
-    gap:18px;
-    padding:17px 20px;
-    background:white;
-    border:1px solid var(--border);
-    border-radius:14px;
-    box-shadow:0 1px 2px #00000008;
-    font-size:.84rem;
-    color:var(--muted);
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
 }
 
 .stat {
-    display:flex;
-    align-items:center;
-    gap:7px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: var(--shadow);
 }
 
-.stat strong {color:var(--text)}
-
-.dot {
-    width:8px;
-    height:8px;
-    border-radius:50%;
+.stat-label {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 650;
 }
 
-.dot-pendente {background:var(--primary)}
-.dot-hoje {background:var(--warning)}
-.dot-atrasado {background:var(--danger)}
-.dot-entregue {background:var(--success)}
+.stat-value {
+  font-size: 27px;
+  font-weight: 800;
+  margin-top: 7px;
+}
 
-/* TOAST */
+.stat.today .stat-value { color: var(--primary); }
+.stat.late .stat-value { color: var(--danger); }
+.stat.done .stat-value { color: var(--success); }
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 18px;
+  box-shadow: var(--shadow);
+}
+
+.panel-title {
+  font-size: 16px;
+  font-weight: 750;
+  margin: 0 0 16px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr auto;
+  gap: 12px;
+  align-items: end;
+}
+
+.field {
+  min-width: 0;
+}
+
+.field label {
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 700;
+  margin-bottom: 7px;
+}
+
+.field input,
+.field select,
+.search-input,
+.sort-select {
+  width: 100%;
+  height: 44px;
+  padding: 10px 12px;
+  color: var(--text);
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  outline: none;
+  font-size: 14px;
+}
+
+.field input:focus,
+.search-input:focus,
+.sort-select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(30,58,138,.10);
+}
+
+/* Campo de data: ícone nativo pequeno, sem emoji */
+input[type="date"] {
+  width: 100%;
+  min-width: 0;
+  height: 44px;
+  padding: 10px 12px;
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--text);
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  box-sizing: border-box;
+  appearance: auto;
+  -webkit-appearance: auto;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  padding: 0;
+  cursor: pointer;
+  opacity: .65;
+}
+
+input[type="date"]::-webkit-inner-spin-button {
+  display: none;
+}
+
+.btn {
+  min-height: 42px;
+  border: 0;
+  border-radius: 9px;
+  padding: 10px 15px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 750;
+  transition: .15s ease;
+}
+
+.btn svg {
+  width: 17px;
+  height: 17px;
+  flex-shrink: 0;
+}
+
+.btn-primary {
+  color: white;
+  background: var(--primary);
+}
+
+.btn-primary:hover {
+  background: var(--primary-dark);
+}
+
+.btn-success {
+  color: white;
+  background: var(--success);
+}
+
+.btn-success:hover {
+  background: #166534;
+}
+
+.btn-light {
+  color: var(--text);
+  background: #f1f5f9;
+  border: 1px solid var(--border);
+}
+
+.btn-light:hover {
+  background: #e2e8f0;
+}
+
+.btn-danger {
+  color: var(--danger);
+  background: var(--danger-light);
+  border: 1px solid #fecaca;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 15px;
+}
+
+.search-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 220px;
+  max-width: 420px;
+}
+
+.search-wrap svg {
+  position: absolute;
+  width: 17px;
+  height: 17px;
+  left: 12px;
+  top: 13px;
+  color: var(--muted);
+  pointer-events: none;
+}
+
+.search-input {
+  padding-left: 38px;
+}
+
+.toolbar-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.sort-select {
+  width: auto;
+  min-width: 170px;
+}
+
+.tabs {
+  display: flex;
+  gap: 7px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 17px;
+  overflow-x: auto;
+}
+
+.tab {
+  padding: 11px 14px;
+  background: transparent;
+  color: var(--muted);
+  border: 0;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 750;
+}
+
+.tab.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.delivery-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 15px;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  background: white;
+}
+
+.delivery-card:hover {
+  border-color: #cbd5e1;
+}
+
+.delivery-info {
+  min-width: 0;
+}
+
+.delivery-name {
+  font-size: 15px;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.delivery-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 7px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.meta-item svg {
+  width: 14px;
+  height: 14px;
+}
+
+.delivery-actions {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-shrink: 0;
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 9px;
+  border-radius: 30px;
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.status.pending {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.status.today {
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+.status.late {
+  background: var(--danger-light);
+  color: var(--danger);
+}
+
+.status.done {
+  background: var(--success-light);
+  color: var(--success);
+}
+
+.icon-btn {
+  width: 37px;
+  height: 37px;
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid var(--border);
+  background: white;
+  color: var(--muted);
+  border-radius: 9px;
+}
+
+.icon-btn:hover {
+  background: #f8fafc;
+  color: var(--primary);
+}
+
+.icon-btn svg {
+  width: 17px;
+  height: 17px;
+}
+
+.empty {
+  padding: 35px 15px;
+  text-align: center;
+  color: var(--muted);
+  border: 1px dashed var(--border);
+  border-radius: 11px;
+  font-size: 13px;
+}
+
+.empty svg {
+  display: block;
+  width: 32px;
+  height: 32px;
+  margin: 0 auto 10px;
+  opacity: .5;
+}
+
+.section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 15px;
+}
+
+.section-heading h2 {
+  font-size: 16px;
+  margin: 0;
+}
+
+.section-heading p {
+  color: var(--muted);
+  font-size: 12px;
+  margin: 5px 0 0;
+}
 
 .toast {
-    position:fixed;
-    z-index:9999;
-    left:50%;
-    bottom:25px;
-    transform:translate(-50%,20px);
-    padding:13px 18px;
-    border-radius:12px;
-    background:#16202e;
-    color:white;
-    font-size:.88rem;
-    box-shadow:0 10px 30px #0003;
-    opacity:0;
-    pointer-events:none;
-    transition:.2s;
-    max-width:calc(100% - 30px);
-    text-align:center;
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translate(-50%, 20px);
+  opacity: 0;
+  pointer-events: none;
+  padding: 12px 17px;
+  background: #172033;
+  color: white;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 650;
+  box-shadow: 0 8px 30px rgba(0,0,0,.18);
+  transition: .2s ease;
+  z-index: 20;
+  max-width: calc(100% - 30px);
+  text-align: center;
 }
 
 .toast.show {
-    opacity:1;
-    transform:translate(-50%,0);
+  opacity: 1;
+  transform: translate(-50%, 0);
 }
 
-/* RESPONSIVIDADE */
-
-@media(max-width:900px) {
-    .toolbar .spacer {display:none}
-    .search-wrap {flex-basis:100%}
+.footer {
+  text-align: center;
+  color: var(--muted);
+  font-size: 11px;
+  padding: 10px 0 25px;
 }
 
-@media(max-width:760px) {
-    .form-row {grid-template-columns:1fr}
-    .form-row .btn {width:100%}
-    .list-header {display:none}
+@media (max-width: 800px) {
+  .stats {
+    grid-template-columns: repeat(3, 1fr);
+  }
 
-    .row {
-        grid-template-columns:1fr auto;
-        grid-template-areas:
-            "client status"
-            "date action";
-        gap:10px;
-        padding:15px;
-    }
+  .form-grid {
+    grid-template-columns: 1fr 1fr;
+  }
 
-    .cell-client {grid-area:client}
-    .cell-date {grid-area:date}
-    .cell-status {grid-area:status}
-    .cell-action {grid-area:action}
+  .form-grid .submit-field {
+    grid-column: 1 / -1;
+  }
 
-    .segment {
-        width:100%;
-        overflow-x:auto;
-    }
-
-    .segment button {flex:1}
-
-    .sort-wrap {width:100%}
-    .sort-wrap select {flex:1;max-width:none}
-
-    .toolbar>.btn {width:100%}
-    .stats {gap:13px}
+  .form-grid .submit-field .btn {
+    width: 100%;
+  }
 }
 
-@media(max-width:390px) {
-    .row {grid-template-columns:1fr}
-    .cell-status,.cell-action {justify-self:start}
-    .cell-action {width:100%;justify-content:flex-start}
+@media (max-width: 560px) {
+  .container {
+    width: calc(100% - 22px);
+    margin-top: 15px;
+  }
+
+  .topbar {
+    padding: 17px 14px;
+  }
+
+  .brand h1 {
+    font-size: 18px;
+  }
+
+  .stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .stat {
+    padding: 12px;
+  }
+
+  .stat-value {
+    font-size: 23px;
+  }
+
+  .panel {
+    padding: 15px;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-grid .submit-field {
+    grid-column: auto;
+  }
+
+  .toolbar {
+    align-items: stretch;
+  }
+
+  .search-wrap {
+    max-width: none;
+    flex-basis: 100%;
+  }
+
+  .toolbar-actions {
+    width: 100%;
+  }
+
+  .sort-select {
+    flex: 1;
+  }
+
+  .delivery-card {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .delivery-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .delivery-meta {
+    gap: 8px;
+  }
 }
 </style>
 </head>
 
 <body>
 
-<div class="app">
-
-<!-- CABEÇALHO COM A LOGO ORIGINAL -->
-
-<header class="header">
+<header class="topbar">
+  <div class="topbar-content">
     <div class="logo-mark" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none"
-             stroke="currentColor" stroke-width="2"
-             stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4a2 2 0 0 0 1-1.73Z"/>
-            <path d="m3.3 7 8.7 5 8.7-5"/>
-            <path d="M12 22V12"/>
-        </svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4a2 2 0 0 0 1-1.73Z"/>
+        <path d="m3.3 7 8.7 5 8.7-5"/>
+        <path d="M12 22V12"/>
+      </svg>
     </div>
-
-    <div>
-        <h1>Controle de Entregas</h1>
-        <p>Gerencie as entregas e o histórico dos clientes</p>
+    <div class="brand">
+      <h1>Controle de Entregas</h1>
+      <p>Gerenciamento de clientes e entregas</p>
     </div>
+  </div>
 </header>
 
-<!-- CADASTRO -->
+<main class="container">
 
-<section class="card form-card">
-    <form class="form-row" id="formEntrega">
+  <section class="stats" aria-label="Resumo das entregas">
+    <div class="stat">
+      <div class="stat-label">Total de registros</div>
+      <div class="stat-value" id="statTotal">0</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Em aberto</div>
+      <div class="stat-value" id="statOpen">0</div>
+    </div>
+    <div class="stat today">
+      <div class="stat-label">Para hoje</div>
+      <div class="stat-value" id="statToday">0</div>
+    </div>
+    <div class="stat late">
+      <div class="stat-label">Atrasadas</div>
+      <div class="stat-value" id="statLate">0</div>
+    </div>
+    <div class="stat done">
+      <div class="stat-label">Entregues</div>
+      <div class="stat-value" id="statDone">0</div>
+    </div>
+  </section>
 
+  <section class="panel">
+    <h2 class="panel-title" id="formTitle">Adicionar cliente</h2>
+
+    <form id="deliveryForm">
+      <div class="form-grid">
         <div class="field">
-            <label for="cliente">Cliente</label>
-            <div class="input-wrap">
-                <input type="text" id="cliente"
-                       maxlength="80"
-                       placeholder="Nome do cliente"
-                       autocomplete="off" required>
-            </div>
+          <label for="clientName">Nome do cliente</label>
+          <input
+            id="clientName"
+            type="text"
+            placeholder="Digite o nome do cliente"
+            maxlength="120"
+            autocomplete="off"
+            required
+          >
         </div>
 
         <div class="field">
-            <label for="data">Data prevista de entrega</label>
-            <div class="input-wrap">
-                <input type="date" id="data" required>
-            </div>
+          <label for="deliveryDate">Data prevista de entrega</label>
+          <input id="deliveryDate" type="date" required>
         </div>
 
-        <button type="submit" class="btn btn-primary">
-            <svg viewBox="0 0 24 24" fill="none"
-                 stroke="currentColor" stroke-width="2.2"
-                 stroke-linecap="round">
-                <path d="M12 5v14M5 12h14"/>
+        <div class="field submit-field">
+          <button class="btn btn-primary" type="submit" id="submitButton">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round">
+              <path d="M12 5v14M5 12h14"/>
             </svg>
-            Adicionar entrega
-        </button>
-
+            Adicionar cliente
+          </button>
+        </div>
+      </div>
     </form>
-</section>
+  </section>
 
-<!-- FILTROS E PESQUISA -->
+  <section class="panel">
+    <div class="section-heading">
+      <div>
+        <h2>Entregas em aberto</h2>
+        <p>Clientes que ainda precisam receber a entrega.</p>
+      </div>
+    </div>
 
-<div class="toolbar" role="toolbar">
-
-    <div class="search-wrap">
-        <svg viewBox="0 0 24 24" fill="none"
-             stroke="currentColor" stroke-width="2"
-             stroke-linecap="round">
-            <circle cx="11" cy="11" r="8"/>
-            <path d="m21 21-4.35-4.35"/>
+    <div class="toolbar">
+      <div class="search-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round">
+          <circle cx="11" cy="11" r="7"/>
+          <path d="m20 20-4-4"/>
         </svg>
+        <input
+          class="search-input"
+          id="searchOpen"
+          type="search"
+          placeholder="Procurar cliente..."
+          aria-label="Procurar cliente nas entregas em aberto"
+        >
+      </div>
 
-        <input type="search" id="pesquisarCliente"
-               placeholder="Pesquisar cliente..."
-               aria-label="Pesquisar cliente">
-    </div>
-
-    <div class="segment" id="filtroStatus">
-        <button type="button" class="active" data-filter="todos">Todos</button>
-        <button type="button" data-filter="pendente">Pendente</button>
-        <button type="button" data-filter="hoje">Hoje</button>
-        <button type="button" data-filter="atrasado">Atrasado</button>
-    </div>
-
-    <div class="sort-wrap">
-        <label for="ordenar">Ordenar:</label>
-        <select id="ordenar">
-            <option value="data-asc">Data mais próxima</option>
-            <option value="data-desc">Data mais distante</option>
-            <option value="cliente-asc">Cliente A–Z</option>
-            <option value="cliente-desc">Cliente Z–A</option>
+      <div class="toolbar-actions">
+        <select class="sort-select" id="sortOpen" aria-label="Ordenar entregas">
+          <option value="date-asc">Data: mais próxima</option>
+          <option value="date-desc">Data: mais distante</option>
+          <option value="name-asc">Cliente: A–Z</option>
+          <option value="name-desc">Cliente: Z–A</option>
         </select>
+      </div>
     </div>
 
-    <div class="spacer"></div>
+    <div class="tabs" id="openFilters">
+      <button class="tab active" data-filter="all" type="button">Todas</button>
+      <button class="tab" data-filter="pending" type="button">Pendentes</button>
+      <button class="tab" data-filter="today" type="button">Hoje</button>
+      <button class="tab" data-filter="late" type="button">Atrasadas</button>
+    </div>
 
-    <button type="button" class="btn btn-secondary" id="limparTudo">
-        <svg viewBox="0 0 24 24" fill="none"
-             stroke="currentColor" stroke-width="2"
-             stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 6h18"/>
-            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/>
-            <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+    <div class="list" id="openList"></div>
+  </section>
+
+  <section class="panel">
+    <div class="section-heading">
+      <div>
+        <h2>Banco de registros / Histórico</h2>
+        <p>Entregas concluídas e suas respectivas datas.</p>
+      </div>
+
+      <button class="btn btn-success" id="exportButton" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <path d="m7 10 5 5 5-5M12 15V3"/>
         </svg>
-        Limpar tudo
-    </button>
-
-</div>
-
-<!-- LISTA DE ENTREGAS EM ABERTO -->
-
-<section class="card list-card">
-
-    <div class="section-heading">
-
-        <div class="section-title">
-            <svg viewBox="0 0 24 24" fill="none"
-                 stroke="currentColor" stroke-width="2"
-                 stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4a2 2 0 0 0 1-1.73Z"/>
-                <path d="m3.3 7 8.7 5 8.7-5"/>
-                <path d="M12 22V12"/>
-            </svg>
-
-            <div>
-                <h2>Entregas em aberto</h2>
-                <p>Clientes que ainda precisam receber os materiais</p>
-            </div>
-        </div>
-
-        <span class="count" id="countAbertas">0</span>
-
+        Exportar registros
+      </button>
     </div>
 
-    <div class="list-header">
-        <span>Cliente</span>
-        <span>Data prevista</span>
-        <span>Status</span>
-        <span style="text-align:right">Ações</span>
+    <div class="toolbar">
+      <div class="search-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round">
+          <circle cx="11" cy="11" r="7"/>
+          <path d="m20 20-4-4"/>
+        </svg>
+        <input
+          class="search-input"
+          id="searchHistory"
+          type="search"
+          placeholder="Pesquisar no histórico..."
+          aria-label="Pesquisar clientes no histórico"
+        >
+      </div>
+
+      <div class="toolbar-actions">
+        <select class="sort-select" id="sortHistory" aria-label="Ordenar histórico">
+          <option value="delivered-desc">Entrega: mais recente</option>
+          <option value="delivered-asc">Entrega: mais antiga</option>
+          <option value="name-asc">Cliente: A–Z</option>
+          <option value="name-desc">Cliente: Z–A</option>
+        </select>
+      </div>
     </div>
 
-    <div id="listaEntregas"></div>
+    <div class="list" id="historyList"></div>
+  </section>
 
-</section>
-
-<!-- BANCO DE REGISTROS -->
-
-<section class="card list-card">
-
-    <div class="section-heading">
-
-        <div class="section-title">
-            <svg viewBox="0 0 24 24" fill="none"
-                 stroke="currentColor" stroke-width="2"
-                 stroke-linecap="round" stroke-linejoin="round">
-                <path d="M4 4h16v16H4z"/>
-                <path d="M8 8h8M8 12h8M8 16h5"/>
-                <path d="M8 2v4M16 2v4"/>
-            </svg>
-
-            <div>
-                <h2>Banco de registros</h2>
-                <p>Histórico de todas as entregas concluídas</p>
-            </div>
-        </div>
-
-        <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap">
-            <span class="count count-success" id="countRegistros">0</span>
-
-            <button type="button" class="btn btn-secondary"
-                    id="gerarArquivo">
-                <svg viewBox="0 0 24 24" fill="none"
-                     stroke="currentColor" stroke-width="2"
-                     stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                    <path d="m7 10 5 5 5-5"/>
-                    <path d="M12 15V3"/>
-                </svg>
-                Exportar registros
-            </button>
-        </div>
-
-    </div>
-
-    <div class="list-header">
-        <span>Cliente</span>
-        <span>Data prevista</span>
-        <span>Data da entrega</span>
-        <span style="text-align:right">Ações</span>
-    </div>
-
-    <div id="listaRegistros"></div>
-
-</section>
-
-<!-- RESUMO -->
-
-<footer class="stats">
-
-    <div class="stat">
-        Total de cadastros:
-        <strong id="statTotal">0</strong>
-    </div>
-
-    <div class="stat">
-        <span class="dot dot-pendente"></span>
-        Em aberto:
-        <strong id="statAbertas">0</strong>
-    </div>
-
-    <div class="stat">
-        <span class="dot dot-hoje"></span>
-        Para hoje:
-        <strong id="statHoje">0</strong>
-    </div>
-
-    <div class="stat">
-        <span class="dot dot-atrasado"></span>
-        Atrasadas:
-        <strong id="statAtrasado">0</strong>
-    </div>
-
-    <div class="stat">
-        <span class="dot dot-entregue"></span>
-        Concluídas:
-        <strong id="statEntregue">0</strong>
-    </div>
-
-</footer>
-
-</div>
+  <div class="footer">
+    Controle de Entregas — Os dados ficam salvos neste dispositivo.
+  </div>
+</main>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
-(function() {
-"use strict";
+(() => {
+  "use strict";
 
-/* =========================================
-   CONFIGURAÇÕES
-========================================= */
+  const STORAGE_KEY = "entregas_clientes_v3";
+  const OLD_STORAGE_KEY = "entregas_clientes_v2";
 
-const STORAGE_KEY = "entregas_clientes_v3";
+  let deliveries = [];
+  let editingId = null;
+  let activeFilter = "all";
+  let toastTimer = null;
 
-let entregas = [];
-let filtroAtivo = "todos";
-let ordenacao = "data-asc";
-let pesquisaCliente = "";
+  const $ = (id) => document.getElementById(id);
 
-const form = document.getElementById("formEntrega");
-const inputCliente = document.getElementById("cliente");
-const inputData = document.getElementById("data");
-const inputPesquisa = document.getElementById("pesquisarCliente");
-const selectOrdenar = document.getElementById("ordenar");
-
-const lista = document.getElementById("listaEntregas");
-const listaRegistros = document.getElementById("listaRegistros");
-
-const filtroBtns = document.querySelectorAll("#filtroStatus button");
-
-const toast = document.getElementById("toast");
-
-const stats = {
-    total:document.getElementById("statTotal"),
-    abertas:document.getElementById("statAbertas"),
-    hoje:document.getElementById("statHoje"),
-    atrasado:document.getElementById("statAtrasado"),
-    entregue:document.getElementById("statEntregue"),
-    countAbertas:document.getElementById("countAbertas"),
-    countRegistros:document.getElementById("countRegistros")
-};
-
-/* =========================================
-   ÍCONES VETORIAIS
-========================================= */
-
-const ICONS = {
-    box: `
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-         stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4a2 2 0 0 0 1-1.73Z"/>
-        <path d="m3.3 7 8.7 5 8.7-5"/>
-        <path d="M12 22V12"/>
-    </svg>`,
-
-    check: `
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-         stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
-        <path d="m5 12 4 4L19 6"/>
-    </svg>`,
-
-    restore: `
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-         stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M3 12a9 9 0 1 0 2.6-6.4L3 8"/>
-        <path d="M3 3v5h5"/>
-    </svg>`,
-
-    trash: `
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-         stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M3 6h18"/>
-        <path d="M19 6v14H5V6"/>
-        <path d="M8 6V4h8v2"/>
-        <path d="M10 11v5M14 11v5"/>
-    </svg>`,
-
-    search: `
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-         stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="11" cy="11" r="8"/>
-        <path d="m21 21-4.35-4.35"/>
-    </svg>`,
-
+  const icons = {
     calendar: `
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-         stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="3" y="4" width="18" height="18" rx="2"/>
-        <path d="M16 2v4M8 2v4M3 10h18"/>
-    </svg>`,
-
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="5" width="18" height="16" rx="2"/>
+        <path d="M16 3v4M8 3v4M3 11h18"/>
+      </svg>`,
+    check: `
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="m5 12 4 4L19 6"/>
+      </svg>`,
+    undo: `
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 14 4 9l5-5"/>
+        <path d="M4 9h10a6 6 0 0 1 0 12h-2"/>
+      </svg>`,
+    trash: `
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 6h18M8 6V4h8v2m3 0-1 14H6L5 6"/>
+        <path d="M10 11v5M14 11v5"/>
+      </svg>`,
     empty: `
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-         stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4a2 2 0 0 0 1-1.73Z"/>
-        <path d="m3.3 7 8.7 5 8.7-5"/>
-        <path d="M12 22V12"/>
-    </svg>`
-};
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
+        <path d="m3.3 7 8.7 5 8.7-5M12 22V12"/>
+      </svg>`
+  };
 
-/* =========================================
-   DATAS
-========================================= */
+  function localDateString(date = new Date()) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  }
 
-function hojeISO() {
-    const d = new Date();
+  function formatDate(value) {
+    if (!value) return "Não informada";
 
-    const ano = d.getFullYear();
-    const mes = String(d.getMonth()+1).padStart(2,"0");
-    const dia = String(d.getDate()).padStart(2,"0");
+    const parts = value.split("-");
+    if (parts.length !== 3) return value;
 
-    return `${ano}-${mes}-${dia}`;
-}
+    return `${parts[2]}/${parts[1]}/${parts[0]}`;
+  }
 
-function formatarData(data) {
-    if (!data) return "—";
+  function escapeHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, char => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#039;"
+    })[char]);
+  }
 
-    const partes = data.split("-");
-
-    if (partes.length !== 3) return "—";
-
-    return `${partes[2]}/${partes[1]}/${partes[0]}`;
-}
-
-function iniciais(nome) {
-    const partes = nome.trim().split(/\s+/).filter(Boolean);
-
-    if (!partes.length) return "?";
-
-    if (partes.length === 1) {
-        return partes[0].slice(0,2).toUpperCase();
-    }
-
-    return (
-        partes[0][0] +
-        partes[partes.length-1][0]
-    ).toUpperCase();
-}
-
-function escaparHTML(valor) {
-    return String(valor).replace(/[&<>"']/g,m => ({
-        "&":"&amp;",
-        "<":"&lt;",
-        ">":"&gt;",
-        '"':"&quot;",
-        "'":"&#039;"
-    })[m]);
-}
-
-/* =========================================
-   STATUS
-========================================= */
-
-function calcularStatus(e) {
-
-    if (e.entregue) return "entregue";
-
-    const hoje = hojeISO();
-
-    if (e.data < hoje) return "atrasado";
-    if (e.data === hoje) return "hoje";
-
-    return "pendente";
-}
-
-const STATUS = {
-    pendente:{
-        label:"Pendente",
-        classe:"badge-pendente"
-    },
-    hoje:{
-        label:"Hoje",
-        classe:"badge-hoje"
-    },
-    atrasado:{
-        label:"Atrasado",
-        classe:"badge-atrasado"
-    },
-    entregue:{
-        label:"Entregue",
-        classe:"badge-entregue"
-    }
-};
-
-/* =========================================
-   ARMAZENAMENTO E MIGRAÇÃO
-========================================= */
-
-function salvar() {
-    try {
-        localStorage.setItem(
-            STORAGE_KEY,
-            JSON.stringify(entregas)
-        );
-    } catch(e) {
-        mostrarToast("Não foi possível salvar os dados.");
-        console.error(e);
-    }
-}
-
-function carregar() {
-
-    try {
-
-        let dados = localStorage.getItem(STORAGE_KEY);
-
-        if (!dados) {
-            dados = localStorage.getItem("entregas_clientes_v2");
-        }
-
-        if (dados) {
-
-            const parsed = JSON.parse(dados);
-
-            if (Array.isArray(parsed)) {
-
-                entregas = parsed
-                    .filter(e =>
-                        e &&
-                        typeof e.cliente === "string" &&
-                        typeof e.data === "string"
-                    )
-                    .map((e,index) => {
-
-                        let entregue = e.entregue === true;
-
-                        return {
-                            id:e.id ?? (Date.now()+index),
-                            cliente:e.cliente,
-                            data:e.data,
-                            entregue:entregue,
-                            entregueEm:entregue
-                                ? (e.entregueEm || e.data)
-                                : null
-                        };
-                    });
-            }
-        }
-
-    } catch(e) {
-
-        console.error("Erro ao carregar registros:",e);
-        entregas = [];
-    }
-
-    salvar();
-}
-
-/* =========================================
-   SEPARAÇÃO ENTRE ABERTAS E CONCLUÍDAS
-========================================= */
-
-function entregasAbertas() {
-    return entregas.filter(e => !e.entregue);
-}
-
-function registrosConcluidos() {
-    return entregas.filter(e => e.entregue);
-}
-
-/* =========================================
-   ORDENAÇÃO
-========================================= */
-
-function ordenarLista(arr) {
-
-    const copia = [...arr];
-
-    switch(ordenacao) {
-
-        case "data-asc":
-            copia.sort((a,b) => a.data.localeCompare(b.data));
-            break;
-
-        case "data-desc":
-            copia.sort((a,b) => b.data.localeCompare(a.data));
-            break;
-
-        case "cliente-asc":
-            copia.sort((a,b) =>
-                a.cliente.localeCompare(b.cliente,"pt-BR",{sensitivity:"base"})
-            );
-            break;
-
-        case "cliente-desc":
-            copia.sort((a,b) =>
-                b.cliente.localeCompare(a.cliente,"pt-BR",{sensitivity:"base"})
-            );
-            break;
-    }
-
-    return copia;
-}
-
-/* =========================================
-   PESQUISA
-========================================= */
-
-function correspondePesquisa(e) {
-
-    return e.cliente
-        .toLocaleLowerCase("pt-BR")
-        .includes(pesquisaCliente.toLocaleLowerCase("pt-BR"));
-}
-
-/* =========================================
-   NOTIFICAÇÃO
-========================================= */
-
-let toastTimer;
-
-function mostrarToast(mensagem) {
-
-    toast.textContent = mensagem;
+  function showToast(message) {
+    const toast = $("toast");
+    toast.textContent = message;
     toast.classList.add("show");
 
     clearTimeout(toastTimer);
-
     toastTimer = setTimeout(() => {
-        toast.classList.remove("show");
-    },3500);
-}
+      toast.classList.remove("show");
+    }, 2800);
+  }
 
-/* =========================================
-   LISTA VAZIA
-========================================= */
+  function makeId() {
+    if (window.crypto && crypto.randomUUID) {
+      return crypto.randomUUID();
+    }
+    return "entrega-" + Date.now() + "-" + Math.random().toString(16).slice(2);
+  }
 
-function mostrarListaVazia(container,titulo,mensagem) {
+  function normalizeRecord(item) {
+    const name = String(
+      item.nome ?? item.cliente ?? item.name ?? ""
+    ).trim();
 
-    container.innerHTML = `
-        <div class="empty">
-            <div class="empty-icon">
-                ${ICONS.empty}
-            </div>
-            <h3>${titulo}</h3>
-            <p>${mensagem}</p>
+    const date = String(
+      item.data ?? item.dataEntrega ?? item.dataPrevista ?? item.date ?? ""
+    ).slice(0, 10);
+
+    const delivered = Boolean(
+      item.entregue ?? item.delivered ?? false
+    );
+
+    let deliveredAt =
+      item.entregueEm ??
+      item.dataEntregue ??
+      item.dataEfetiva ??
+      item.deliveredAt ??
+      "";
+
+    // Registros antigos não possuíam data efetiva.
+    // Nesse caso, preservamos a data prevista como referência.
+    if (delivered && !deliveredAt) {
+      deliveredAt = date;
+    }
+
+    return {
+      id: String(item.id || makeId()),
+      nome: name,
+      data: date,
+      entregue: delivered,
+      entregueEm: deliveredAt
+    };
+  }
+
+  function loadData() {
+    try {
+      let raw = localStorage.getItem(STORAGE_KEY);
+
+      if (!raw) {
+        raw = localStorage.getItem(OLD_STORAGE_KEY);
+      }
+
+      if (!raw) {
+        deliveries = [];
+        return;
+      }
+
+      const parsed = JSON.parse(raw);
+
+      const records = Array.isArray(parsed)
+        ? parsed
+        : Array.isArray(parsed.entregas)
+          ? parsed.entregas
+          : Array.isArray(parsed.registros)
+            ? parsed.registros
+            : [];
+
+      deliveries = records
+        .map(normalizeRecord)
+        .filter(item => item.nome && item.data);
+
+      saveData();
+    } catch (error) {
+      console.error("Erro ao carregar registros:", error);
+      deliveries = [];
+      showToast("Não foi possível ler os registros salvos.");
+    }
+  }
+
+  function saveData() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(deliveries));
+    } catch (error) {
+      console.error("Erro ao salvar:", error);
+      showToast("Erro ao salvar. Verifique o espaço disponível.");
+    }
+  }
+
+  function getStatus(item) {
+    if (item.entregue) return "done";
+
+    const today = localDateString();
+
+    if (item.data < today) return "late";
+    if (item.data === today) return "today";
+
+    return "pending";
+  }
+
+  function getStatusLabel(status) {
+    const labels = {
+      pending: "Pendente",
+      today: "Entrega hoje",
+      late: "Atrasada",
+      done: "Entregue"
+    };
+
+    return labels[status] || status;
+  }
+
+  function renderStats() {
+    const today = localDateString();
+    const open = deliveries.filter(item => !item.entregue);
+    const done = deliveries.filter(item => item.entregue);
+
+    $("statTotal").textContent = deliveries.length;
+    $("statOpen").textContent = open.length;
+    $("statToday").textContent = open.filter(item => item.data === today).length;
+    $("statLate").textContent = open.filter(item => item.data < today).length;
+    $("statDone").textContent = done.length;
+  }
+
+  function sortRecords(records, mode) {
+    const sorted = [...records];
+
+    sorted.sort((a, b) => {
+      if (mode === "date-asc") {
+        return a.data.localeCompare(b.data) || a.nome.localeCompare(b.nome, "pt-BR");
+      }
+
+      if (mode === "date-desc") {
+        return b.data.localeCompare(a.data) || a.nome.localeCompare(b.nome, "pt-BR");
+      }
+
+      if (mode === "name-asc") {
+        return a.nome.localeCompare(b.nome, "pt-BR");
+      }
+
+      if (mode === "name-desc") {
+        return b.nome.localeCompare(a.nome, "pt-BR");
+      }
+
+      if (mode === "delivered-asc") {
+        return (a.entregueEm || a.data).localeCompare(b.entregueEm || b.data);
+      }
+
+      if (mode === "delivered-desc") {
+        return (b.entregueEm || b.data).localeCompare(a.entregueEm || a.data);
+      }
+
+      return 0;
+    });
+
+    return sorted;
+  }
+
+  function createDeliveryCard(item, isHistory = false) {
+    const status = getStatus(item);
+
+    const deliveryDate = `
+      <span class="meta-item">
+        ${icons.calendar}
+        Prevista: ${formatDate(item.data)}
+      </span>`;
+
+    const deliveredDate = isHistory ? `
+      <span class="meta-item">
+        ${icons.check}
+        Entregue em: ${formatDate(item.entregueEm || item.data)}
+      </span>` : "";
+
+    const actions = isHistory
+      ? `
+        <button class="icon-btn" type="button"
+          title="Voltar para entregas em aberto"
+          aria-label="Reabrir entrega de ${escapeHTML(item.nome)}"
+          data-action="reopen" data-id="${escapeHTML(item.id)}">
+          ${icons.undo}
+        </button>
+        <button class="icon-btn" type="button"
+          title="Excluir registro"
+          aria-label="Excluir registro de ${escapeHTML(item.nome)}"
+          data-action="delete" data-id="${escapeHTML(item.id)}">
+          ${icons.trash}
+        </button>`
+      : `
+        <button class="btn btn-success" type="button"
+          data-action="deliver" data-id="${escapeHTML(item.id)}">
+          ${icons.check}
+          Entregar
+        </button>
+        <button class="icon-btn" type="button"
+          title="Editar cliente"
+          aria-label="Editar ${escapeHTML(item.nome)}"
+          data-action="edit" data-id="${escapeHTML(item.id)}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m16 4 4 4L8 20H4v-4Z"/>
+            <path d="m14 6 4 4"/>
+          </svg>
+        </button>
+        <button class="icon-btn" type="button"
+          title="Excluir entrega"
+          aria-label="Excluir ${escapeHTML(item.nome)}"
+          data-action="delete" data-id="${escapeHTML(item.id)}">
+          ${icons.trash}
+        </button>`;
+
+    return `
+      <article class="delivery-card">
+        <div class="delivery-info">
+          <div class="delivery-name">${escapeHTML(item.nome)}</div>
+          <div class="delivery-meta">
+            ${deliveryDate}
+            ${deliveredDate}
+          </div>
         </div>
-    `;
-}
 
-/* =========================================
-   RENDERIZAR ENTREGAS EM ABERTO
-========================================= */
+        <div class="delivery-actions">
+          <span class="status ${status}">${getStatusLabel(status)}</span>
+          ${actions}
+        </div>
+      </article>`;
+  }
 
-function renderizarAbertas() {
+  function renderOpen() {
+    const search = $("searchOpen").value.trim().toLocaleLowerCase("pt-BR");
+    const sort = $("sortOpen").value;
 
-    let abertas = ordenarLista(entregasAbertas());
+    let records = deliveries.filter(item => !item.entregue);
 
-    abertas = abertas.filter(e => {
-
-        const correspondeStatus =
-            filtroAtivo === "todos" ||
-            calcularStatus(e) === filtroAtivo;
-
-        return correspondeStatus && correspondePesquisa(e);
-    });
-
-    stats.countAbertas.textContent = entregasAbertas().length;
-
-    if (!abertas.length) {
-
-        mostrarListaVazia(
-            lista,
-            "Nenhuma entrega em aberto",
-            entregasAbertas().length === 0
-                ? "Todos os clientes cadastrados já foram atendidos ou ainda não existem cadastros."
-                : "Nenhum cliente corresponde à pesquisa ou ao filtro selecionado."
-        );
-
-        return;
+    if (search) {
+      records = records.filter(item =>
+        item.nome.toLocaleLowerCase("pt-BR").includes(search)
+      );
     }
 
-    lista.innerHTML = abertas.map(e => {
-
-        const status = calcularStatus(e);
-        const meta = STATUS[status];
-        const nome = escaparHTML(e.cliente);
-
-        return `
-            <div class="row" data-id="${escaparHTML(e.id)}">
-
-                <div class="cell-client">
-
-                    <div class="avatar">
-                        ${escaparHTML(iniciais(e.cliente))}
-                    </div>
-
-                    <div class="client-info">
-                        <span class="client-name">${nome}</span>
-                        <span class="client-detail">Entrega em aberto</span>
-                    </div>
-
-                </div>
-
-                <div class="cell-date">
-                    ${ICONS.calendar}
-                    ${formatarData(e.data)}
-                </div>
-
-                <div class="cell-status">
-                    <span class="badge ${meta.classe}">
-                        ${meta.label}
-                    </span>
-                </div>
-
-                <div class="cell-action">
-
-                    <button type="button"
-                        class="btn-entregar"
-                        data-action="entregar"
-                        data-id="${escaparHTML(e.id)}"
-                        aria-label="Confirmar entrega de ${nome}">
-
-                        ${ICONS.check}
-                        ENTREGAR
-
-                    </button>
-
-                    <button type="button"
-                        class="btn-icon"
-                        data-action="excluir"
-                        data-id="${escaparHTML(e.id)}"
-                        title="Excluir cadastro"
-                        aria-label="Excluir entrega de ${nome}">
-
-                        ${ICONS.trash}
-
-                    </button>
-
-                </div>
-
-            </div>
-        `;
-
-    }).join("");
-}
-
-/* =========================================
-   RENDERIZAR BANCO DE REGISTROS
-========================================= */
-
-function renderizarRegistros() {
-
-    const registros = ordenarLista(registrosConcluidos())
-        .filter(correspondePesquisa);
-
-    stats.countRegistros.textContent = registrosConcluidos().length;
-
-    if (!registros.length) {
-
-        mostrarListaVazia(
-            listaRegistros,
-            "Nenhum registro encontrado",
-            registrosConcluidos().length === 0
-                ? "As entregas concluídas aparecerão automaticamente aqui."
-                : "Nenhum registro corresponde à pesquisa."
-        );
-
-        return;
+    if (activeFilter === "pending") {
+      records = records.filter(item => getStatus(item) === "pending");
+    } else if (activeFilter === "today") {
+      records = records.filter(item => getStatus(item) === "today");
+    } else if (activeFilter === "late") {
+      records = records.filter(item => getStatus(item) === "late");
     }
 
-    listaRegistros.innerHTML = registros.map(e => {
+    records = sortRecords(records, sort);
 
-        const nome = escaparHTML(e.cliente);
+    $("openList").innerHTML = records.length
+      ? records.map(item => createDeliveryCard(item)).join("")
+      : `<div class="empty">${icons.empty}<strong>Nenhuma entrega encontrada</strong><br>Os clientes aparecerão aqui quando forem cadastrados.</div>`;
+  }
 
-        return `
-            <div class="row" data-id="${escaparHTML(e.id)}">
+  function renderHistory() {
+    const search = $("searchHistory").value.trim().toLocaleLowerCase("pt-BR");
+    const sort = $("sortHistory").value;
 
-                <div class="cell-client">
+    let records = deliveries.filter(item => item.entregue);
 
-                    <div class="avatar avatar-done">
-                        ${ICONS.check}
-                    </div>
+    if (search) {
+      records = records.filter(item =>
+        item.nome.toLocaleLowerCase("pt-BR").includes(search)
+      );
+    }
 
-                    <div class="client-info">
-                        <span class="client-name">${nome}</span>
-                        <span class="client-detail">Entrega concluída</span>
-                    </div>
+    records = sortRecords(records, sort);
 
-                </div>
+    $("historyList").innerHTML = records.length
+      ? records.map(item => createDeliveryCard(item, true)).join("")
+      : `<div class="empty">${icons.empty}<strong>Nenhum registro de entrega</strong><br>Quando você marcar um cliente como entregue, ele aparecerá aqui.</div>`;
+  }
 
-                <div class="cell-date">
-                    <span class="date-label">Data prevista</span>
-                    ${formatarData(e.data)}
-                </div>
+  function renderAll() {
+    renderStats();
+    renderOpen();
+    renderHistory();
+  }
 
-                <div class="cell-date">
-                    <span class="date-label">Data da entrega</span>
-                    ${formatarData(e.entregueEm || e.data)}
-                </div>
+  function resetForm() {
+    editingId = null;
+    $("deliveryForm").reset();
+    $("deliveryDate").value = localDateString();
+    $("formTitle").textContent = "Adicionar cliente";
+    $("submitButton").innerHTML = `
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round">
+        <path d="M12 5v14M5 12h14"/>
+      </svg>
+      Adicionar cliente`;
+  }
 
-                <div class="cell-action">
+  $("deliveryForm").addEventListener("submit", event => {
+    event.preventDefault();
 
-                    <span class="badge badge-entregue">
-                        ${ICONS.check}
-                        Concluída
-                    </span>
+    const name = $("clientName").value.trim();
+    const date = $("deliveryDate").value;
 
-                    <button type="button"
-                        class="btn-icon btn-restore"
-                        data-action="restaurar"
-                        data-id="${escaparHTML(e.id)}"
-                        title="Retornar para entregas em aberto"
-                        aria-label="Desfazer entrega de ${nome}">
+    if (!name || !date) {
+      showToast("Preencha o nome e a data prevista.");
+      return;
+    }
 
-                        ${ICONS.restore}
+    if (editingId) {
+      const item = deliveries.find(record => record.id === editingId);
 
-                    </button>
+      if (item) {
+        item.nome = name;
+        item.data = date;
+        saveData();
+        showToast("Cadastro atualizado.");
+      }
+    } else {
+      deliveries.push({
+        id: makeId(),
+        nome: name,
+        data: date,
+        entregue: false,
+        entregueEm: ""
+      });
 
-                    <button type="button"
-                        class="btn-icon"
-                        data-action="excluir"
-                        data-id="${escaparHTML(e.id)}"
-                        title="Excluir registro"
-                        aria-label="Excluir registro de ${nome}">
+      saveData();
+      showToast("Cliente adicionado com sucesso.");
+    }
 
-                        ${ICONS.trash}
+    resetForm();
+    renderAll();
+  });
 
-                    </button>
-
-                </div>
-
-            </div>
-        `;
-
-    }).join("");
-}
-
-/* =========================================
-   ESTATÍSTICAS GERAIS
-========================================= */
-
-function atualizarEstatisticas() {
-
-    const abertas = entregasAbertas();
-
-    let hoje = 0;
-    let atrasado = 0;
-
-    abertas.forEach(e => {
-
-        const status = calcularStatus(e);
-
-        if (status === "hoje") hoje++;
-        if (status === "atrasado") atrasado++;
-    });
-
-    stats.total.textContent = entregas.length;
-    stats.abertas.textContent = abertas.length;
-    stats.hoje.textContent = hoje;
-    stats.atrasado.textContent = atrasado;
-    stats.entregue.textContent = registrosConcluidos().length;
-}
-
-/* =========================================
-   RENDERIZAÇÃO GERAL
-========================================= */
-
-function renderizar() {
-
-    renderizarAbertas();
-    renderizarRegistros();
-    atualizarEstatisticas();
-}
-
-/* =========================================
-   ADICIONAR
-========================================= */
-
-function adicionar(cliente,data) {
-
-    entregas.push({
-        id:Date.now()+Math.floor(Math.random()*1000),
-        cliente:cliente.trim(),
-        data:data,
-        entregue:false,
-        entregueEm:null
-    });
-
-    salvar();
-    renderizar();
-
-    mostrarToast("Entrega cadastrada com sucesso.");
-}
-
-/* =========================================
-   CONFIRMAR ENTREGA
-========================================= */
-
-function confirmarEntrega(id) {
-
-    const item = entregas.find(e => String(e.id) === String(id));
-
+  function deliverItem(id) {
+    const item = deliveries.find(record => record.id === id);
     if (!item || item.entregue) return;
 
-    const confirmar = confirm(
-        "CONFIRMAR ENTREGA\n\n"+
-        "Cliente: "+item.cliente+"\n"+
-        "Data prevista: "+formatarData(item.data)+"\n\n"+
-        "Deseja registrar esta entrega como concluída?"
+    const confirmed = confirm(
+      `Confirmar a entrega para ${item.nome}?\\n\\nO cliente sairá da lista de entregas em aberto e será enviado ao histórico.`
     );
 
-    if (!confirmar) return;
+    if (!confirmed) return;
 
     item.entregue = true;
+    item.entregueEm = localDateString();
 
-    // Guarda a data real em que a entrega foi confirmada.
-    item.entregueEm = hojeISO();
+    saveData();
+    renderAll();
+    showToast("Entrega registrada no histórico.");
+  }
 
-    salvar();
-    renderizar();
-
-    mostrarToast("Entrega concluída e enviada ao banco de registros.");
-}
-
-/* =========================================
-   RESTAURAR ENTREGA
-========================================= */
-
-function restaurarEntrega(id) {
-
-    const item = entregas.find(e => String(e.id) === String(id));
-
+  function reopenItem(id) {
+    const item = deliveries.find(record => record.id === id);
     if (!item || !item.entregue) return;
 
-    if (!confirm(
-        "Deseja retirar este cliente do banco de registros e retornar para entregas em aberto?"
-    )) {
-        return;
-    }
-
-    item.entregue = false;
-    item.entregueEm = null;
-
-    salvar();
-    renderizar();
-
-    mostrarToast("Registro restaurado para entregas em aberto.");
-}
-
-/* =========================================
-   EXCLUIR CADASTRO OU REGISTRO
-========================================= */
-
-function excluirEntrega(id) {
-
-    const item = entregas.find(e => String(e.id) === String(id));
-
-    if (!item) return;
-
-    if (!confirm(
-        "Deseja excluir definitivamente o cadastro de "+item.cliente+"?"
-    )) {
-        return;
-    }
-
-    entregas = entregas.filter(e => String(e.id) !== String(id));
-
-    salvar();
-    renderizar();
-
-    mostrarToast("Cadastro excluído.");
-}
-
-/* =========================================
-   LIMPAR TODOS OS REGISTROS
-========================================= */
-
-function limparTudo() {
-
-    if (!entregas.length) {
-        alert("Não existem cadastros para excluir.");
-        return;
-    }
-
-    if (!confirm(
-        "ATENÇÃO!\n\n"+
-        "Isso excluirá todas as entregas em aberto e todo o banco de registros.\n\n"+
-        "Esta ação não pode ser desfeita."
-    )) {
-        return;
-    }
-
-    entregas = [];
-
-    salvar();
-    renderizar();
-
-    mostrarToast("Todos os registros foram removidos.");
-}
-
-/* =========================================
-   EXPORTAR BANCO DE REGISTROS
-========================================= */
-
-function gerarArquivoEntrega() {
-
-    const registros = ordenarLista(registrosConcluidos());
-
-    if (!registros.length) {
-        alert("O banco de registros ainda está vazio.");
-        return;
-    }
-
-    const cabecalho = [
-        "Cliente",
-        "Data prevista",
-        "Data efetiva da entrega",
-        "Situação"
-    ];
-
-    const linhas = registros.map(e => [
-        e.cliente,
-        formatarData(e.data),
-        formatarData(e.entregueEm || e.data),
-        "ENTREGUE"
-    ]);
-
-    function escaparCSV(valor) {
-        return '"'+String(valor).replace(/"/g,'""')+'"';
-    }
-
-    const conteudo = [
-        cabecalho,
-        ...linhas
-    ].map(linha =>
-        linha.map(escaparCSV).join(";")
-    ).join("\r\n");
-
-    const arquivo = new Blob(
-        ["\uFEFF"+conteudo],
-        {type:"text/csv;charset=utf-8;"}
+    const confirmed = confirm(
+      `Deseja reabrir a entrega de ${item.nome}?`
     );
 
-    const url = URL.createObjectURL(arquivo);
+    if (!confirmed) return;
+
+    item.entregue = false;
+    item.entregueEm = "";
+
+    saveData();
+    renderAll();
+    showToast("Entrega voltou para a lista de abertas.");
+  }
+
+  function deleteItem(id) {
+    const item = deliveries.find(record => record.id === id);
+    if (!item) return;
+
+    const confirmed = confirm(
+      `Excluir o registro de ${item.nome}? Esta ação não poderá ser desfeita.`
+    );
+
+    if (!confirmed) return;
+
+    deliveries = deliveries.filter(record => record.id !== id);
+
+    if (editingId === id) resetForm();
+
+    saveData();
+    renderAll();
+    showToast("Registro excluído.");
+  }
+
+  function editItem(id) {
+    const item = deliveries.find(record => record.id === id);
+    if (!item || item.entregue) return;
+
+    editingId = id;
+    $("clientName").value = item.nome;
+    $("deliveryDate").value = item.data;
+
+    $("formTitle").textContent = "Editar cliente";
+    $("submitButton").innerHTML = `
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="m5 12 4 4L19 6"/>
+      </svg>
+      Salvar alterações`;
+
+    $("clientName").focus();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  document.addEventListener("click", event => {
+    const button = event.target.closest("[data-action]");
+    if (!button) return;
+
+    const id = button.dataset.id;
+    const action = button.dataset.action;
+
+    if (action === "deliver") deliverItem(id);
+    if (action === "reopen") reopenItem(id);
+    if (action === "delete") deleteItem(id);
+    if (action === "edit") editItem(id);
+  });
+
+  $("openFilters").addEventListener("click", event => {
+    const button = event.target.closest("[data-filter]");
+    if (!button) return;
+
+    activeFilter = button.dataset.filter;
+
+    document.querySelectorAll("#openFilters .tab").forEach(tab => {
+      tab.classList.toggle("active", tab === button);
+    });
+
+    renderOpen();
+  });
+
+  $("searchOpen").addEventListener("input", renderOpen);
+  $("searchHistory").addEventListener("input", renderHistory);
+  $("sortOpen").addEventListener("change", renderOpen);
+  $("sortHistory").addEventListener("change", renderHistory);
+
+  function csvCell(value) {
+    const text = String(value ?? "");
+    return '"' + text.replace(/"/g, '""') + '"';
+  }
+
+  function exportHistory() {
+    const records = sortRecords(
+      deliveries.filter(item => item.entregue),
+      "delivered-desc"
+    );
+
+    if (!records.length) {
+      showToast("Ainda não existem entregas concluídas para exportar.");
+      return;
+    }
+
+    const header = [
+      "Cliente",
+      "Data prevista",
+      "Data efetiva da entrega",
+      "Situação"
+    ];
+
+    const rows = records.map(item => [
+      item.nome,
+      formatDate(item.data),
+      formatDate(item.entregueEm || item.data),
+      "Entregue"
+    ]);
+
+    const csv = [
+      header.map(csvCell).join(";"),
+      ...rows.map(row => row.map(csvCell).join(";"))
+    ].join("\\r\\n");
+
+    // BOM para abrir corretamente caracteres acentuados no Excel.
+    const blob = new Blob(
+      ["\\uFEFF", csv],
+      { type: "text/csv;charset=utf-8;" }
+    );
+
+    const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
 
     link.href = url;
-    link.download = "banco_de_registros_entregas_"+hojeISO()+".csv";
+    link.download = `registros-entregas-${localDateString()}.csv`;
 
     document.body.appendChild(link);
     link.click();
     link.remove();
 
-    setTimeout(() => URL.revokeObjectURL(url),1000);
+    URL.revokeObjectURL(url);
 
-    mostrarToast(
-        registros.length+" registro(s) exportado(s) com sucesso."
-    );
-}
+    showToast("Arquivo de registros gerado.");
+  }
 
-/* =========================================
-   EVENTO DO FORMULÁRIO
-========================================= */
+  $("exportButton").addEventListener("click", exportHistory);
 
-form.addEventListener("submit",function(ev) {
-
-    ev.preventDefault();
-
-    const cliente = inputCliente.value.trim();
-    const data = inputData.value;
-
-    if (!cliente) {
-        inputCliente.focus();
-        return;
-    }
-
-    if (!data) {
-        inputData.focus();
-        return;
-    }
-
-    adicionar(cliente,data);
-
-    inputCliente.value = "";
-    inputData.value = "";
-    inputCliente.focus();
-});
-
-/* =========================================
-   EVENTOS DA LISTA DE ABERTAS
-========================================= */
-
-lista.addEventListener("click",function(ev) {
-
-    const btn = ev.target.closest("[data-action]");
-
-    if (!btn) return;
-
-    const id = btn.dataset.id;
-    const action = btn.dataset.action;
-
-    if (action === "entregar") {
-        confirmarEntrega(id);
-    }
-
-    if (action === "excluir") {
-        excluirEntrega(id);
-    }
-});
-
-/* =========================================
-   EVENTOS DO BANCO DE REGISTROS
-========================================= */
-
-listaRegistros.addEventListener("click",function(ev) {
-
-    const btn = ev.target.closest("[data-action]");
-
-    if (!btn) return;
-
-    const id = btn.dataset.id;
-    const action = btn.dataset.action;
-
-    if (action === "restaurar") {
-        restaurarEntrega(id);
-    }
-
-    if (action === "excluir") {
-        excluirEntrega(id);
-    }
-});
-
-/* =========================================
-   PESQUISA
-========================================= */
-
-inputPesquisa.addEventListener("input",function() {
-
-    pesquisaCliente = this.value.trim();
-
-    renderizar();
-});
-
-/* =========================================
-   FILTROS
-========================================= */
-
-filtroBtns.forEach(btn => {
-
-    btn.addEventListener("click",function() {
-
-        filtroBtns.forEach(b => b.classList.remove("active"));
-
-        this.classList.add("active");
-
-        filtroAtivo = this.dataset.filter;
-
-        renderizar();
-    });
-});
-
-/* =========================================
-   ORDENAÇÃO
-========================================= */
-
-selectOrdenar.addEventListener("change",function() {
-
-    ordenacao = this.value;
-
-    renderizar();
-});
-
-/* =========================================
-   BOTÕES
-========================================= */
-
-document.getElementById("limparTudo")
-    .addEventListener("click",limparTudo);
-
-document.getElementById("gerarArquivo")
-    .addEventListener("click",gerarArquivoEntrega);
-
-/* =========================================
-   SERVICE WORKER / PWA
-========================================= */
-
-if ("serviceWorker" in navigator) {
-
-    window.addEventListener("load",function() {
-
-        navigator.serviceWorker.register("sw.js")
-            .catch(err => {
-                console.warn("Falha no Service Worker:",err);
-            });
-
-    });
-}
-
-/* =========================================
-   CONEXÃO
-========================================= */
-
-window.addEventListener("online",function() {
-    mostrarToast("Conexão restaurada.");
-});
-
-window.addEventListener("offline",function() {
-    mostrarToast("Você está offline. Os dados continuam salvos.");
-});
-
-/* =========================================
-   INICIALIZAÇÃO
-========================================= */
-
-carregar();
-renderizar();
+  // Inicialização
+  loadData();
+  resetForm();
+  renderAll();
 
 })();
 </script>
