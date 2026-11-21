@@ -1,0 +1,21 @@
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Editores
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Node (caso use ferramentas)
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# Build / dist
+dist/
+build/
+
+# Logs
+*.log
