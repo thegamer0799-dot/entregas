@@ -194,10 +194,30 @@
 
     .toolbar .spacer { flex: 1; }
 
+    .sort-wrap {
+        display: flex; align-items: center; gap: 0.5rem;
+        font-size: 0.85rem; color: var(--text-muted);
+    }
+    .sort-wrap label { font-weight: 600; }
+    .sort-wrap select {
+        font-family: inherit; font-size: 0.85rem; font-weight: 600;
+        color: var(--text); background: var(--surface-2);
+        border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+        padding: 0.45rem 2rem 0.45rem 0.75rem; cursor: pointer;
+        outline: none; transition: border-color var(--transition);
+        appearance: none;
+        background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23667a92' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 0.5rem center;
+        background-size: 16px;
+    }
+    .sort-wrap select:hover { border-color: var(--border-strong); }
+    .sort-wrap select:focus { border-color: var(--primary); }
+
     .list-card { overflow: hidden; }
 
     .list-header {
-        display: grid; grid-template-columns: 1.6fr 1fr 130px 48px;
+        display: grid; grid-template-columns: 1.6fr 1fr 130px 84px;
         gap: 1rem; align-items: center; padding: 0.9rem 1.5rem;
         background: var(--surface-2); border-bottom: 1px solid var(--border);
         font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
@@ -207,13 +227,15 @@
     .list-body { display: flex; flex-direction: column; }
 
     .row {
-        display: grid; grid-template-columns: 1.6fr 1fr 130px 48px;
+        display: grid; grid-template-columns: 1.6fr 1fr 130px 84px;
         gap: 1rem; align-items: center; padding: 1rem 1.5rem;
         border-bottom: 1px solid var(--border);
         transition: background var(--transition); animation: rowIn 320ms ease both;
     }
     .row:last-child { border-bottom: none; }
     .row:hover { background: var(--surface-2); }
+    .row.is-done .client-name { color: var(--text-muted); text-decoration: line-through; }
+    .row.is-done .avatar { background: var(--success-soft); color: var(--success); }
 
     @keyframes rowIn {
         from { opacity: 0; transform: translateY(-4px); }
@@ -248,15 +270,28 @@
     .badge-atrasado { background: var(--danger-soft);  color: var(--danger); }
     .badge-entregue { background: var(--success-soft); color: var(--success); }
 
+    .cell-action {
+        display: flex; align-items: center; gap: 4px; justify-self: end;
+    }
+
     .btn-icon {
         width: 36px; height: 36px; border-radius: 10px;
         border: 1px solid transparent; background: transparent;
         color: var(--text-muted); display: grid; place-items: center;
-        cursor: pointer; transition: all var(--transition); justify-self: end;
+        cursor: pointer; transition: all var(--transition);
     }
     .btn-icon svg { width: 17px; height: 17px; }
     .btn-icon:hover {
         background: var(--danger-soft); color: var(--danger); border-color: var(--danger-soft);
+    }
+    .btn-icon.btn-done:hover {
+        background: var(--success-soft); color: var(--success); border-color: var(--success-soft);
+    }
+    .btn-icon.btn-done.is-done {
+        color: var(--success); background: var(--success-soft); border-color: var(--success-soft);
+    }
+    .btn-icon.btn-done.is-done:hover {
+        color: var(--text-muted); background: var(--surface-2); border-color: var(--border);
     }
 
     .empty {
@@ -352,6 +387,8 @@
         .toolbar .spacer { display: none; }
         .segment { width: 100%; overflow-x: auto; }
         .segment button { flex: 1; justify-content: center; white-space: nowrap; }
+        .sort-wrap { width: 100%; }
+        .sort-wrap select { flex: 1; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -416,13 +453,22 @@
         </form>
     </section>
 
-    <div class="toolbar" role="toolbar" aria-label="Filtros">
+    <div class="toolbar" role="toolbar" aria-label="Filtros e ordenação">
         <div class="segment" id="filtroStatus" role="tablist" aria-label="Filtrar por status">
             <button type="button" class="active" data-filter="todos" role="tab" aria-selected="true">Todos</button>
             <button type="button" data-filter="pendente" role="tab" aria-selected="false"><span class="dot"></span>Pendente</button>
             <button type="button" data-filter="hoje" role="tab" aria-selected="false"><span class="dot"></span>Hoje</button>
             <button type="button" data-filter="atrasado" role="tab" aria-selected="false"><span class="dot"></span>Atrasado</button>
             <button type="button" data-filter="entregue" role="tab" aria-selected="false"><span class="dot"></span>Entregue</button>
+        </div>
+
+        <div class="sort-wrap">
+            <label for="ordenar">Ordenar:</label>
+            <select id="ordenar">
+                <option value="data-asc">Data (mais próxima)</option>
+                <option value="data-desc">Data (mais distante)</option>
+                <option value="cliente-asc">Cliente (A→Z)</option>
+            </select>
         </div>
 
         <div class="spacer"></div>
@@ -442,7 +488,7 @@
             <span>Cliente</span>
             <span>Data de entrega</span>
             <span>Status</span>
-            <span></span>
+            <span style="text-align:right">Ações</span>
         </div>
         <div class="list-body" id="listaEntregas"></div>
     </section>
@@ -473,9 +519,10 @@
 (function () {
     "use strict";
 
-    const STORAGE_KEY = "entregas_clientes_v2";
+    const STORAGE_KEY = "entregas_clientes_v3";
     let entregas = [];
     let filtroAtivo = "todos";
+    let ordenacao = "data-asc";
 
     const form = document.getElementById("formEntrega");
     const inputCliente = document.getElementById("cliente");
@@ -483,6 +530,7 @@
     const lista = document.getElementById("listaEntregas");
     const filtroBtns = document.querySelectorAll("#filtroStatus button");
     const btnLimparTudo = document.getElementById("limparTudo");
+    const selectOrdenar = document.getElementById("ordenar");
 
     const stats = {
         total: document.getElementById("statTotal"),
@@ -505,10 +553,29 @@
                         id: Number(e.id) || Date.now() + Math.random(),
                         cliente: e.cliente,
                         data: e.data,
+                        entregue: e.entregue === true,
                     }));
                 }
             }
         } catch (_) { entregas = []; }
+
+        // Migração simples da chave antiga (v2) para v3, preservando dados
+        if (entregas.length === 0 && !localStorage.getItem(STORAGE_KEY)) {
+            try {
+                const antigo = JSON.parse(localStorage.getItem("entregas_clientes_v2") || "[]");
+                if (Array.isArray(antigo) && antigo.length > 0) {
+                    entregas = antigo
+                        .filter((e) => e && typeof e.cliente === "string" && typeof e.data === "string")
+                        .map((e) => ({
+                            id: Number(e.id) || Date.now() + Math.random(),
+                            cliente: e.cliente,
+                            data: e.data,
+                            entregue: false,
+                        }));
+                    salvar();
+                }
+            } catch (_) {}
+        }
 
         if (entregas.length === 0 && !localStorage.getItem(STORAGE_KEY + "_seed")) {
             const hoje = new Date();
@@ -518,10 +585,10 @@
                 return d.toISOString().slice(0, 10);
             };
             entregas = [
-                { id: 1, cliente: "Construtora Alpha", data: addDias(3) },
-                { id: 2, cliente: "Metalúrgica Beta", data: addDias(-2) },
-                { id: 3, cliente: "Madeireira Gama", data: addDias(0) },
-                { id: 4, cliente: "Elétrica Delta", data: addDias(-5) },
+                { id: 1, cliente: "Construtora Alpha", data: addDias(3), entregue: false },
+                { id: 2, cliente: "Metalúrgica Beta", data: addDias(-2), entregue: true },
+                { id: 3, cliente: "Madeireira Gama", data: addDias(0), entregue: false },
+                { id: 4, cliente: "Elétrica Delta", data: addDias(-5), entregue: false },
             ];
             salvar();
             localStorage.setItem(STORAGE_KEY + "_seed", "1");
@@ -535,10 +602,18 @@
     // ===== Helpers =====
     function hojeISO() { return new Date().toISOString().slice(0, 10); }
 
-    function calcularStatus(dataISO) {
+    /**
+     * Status efetivo:
+     * - Se marcada manualmente como entregue → "entregue"
+     * - Se data < hoje → "atrasado"
+     * - Se data === hoje → "hoje"
+     * - Se data > hoje → "pendente"
+     */
+    function calcularStatus(e) {
+        if (e.entregue) return "entregue";
         const hoje = hojeISO();
-        if (dataISO < hoje) return "entregue";
-        if (dataISO === hoje) return "hoje";
+        if (e.data < hoje) return "atrasado";
+        if (e.data === hoje) return "hoje";
         return "pendente";
     }
 
@@ -566,6 +641,8 @@
         clock: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg>`,
         alert: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`,
         check: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>`,
+        checkCircle: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`,
+        undo: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg>`,
         trash: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>`,
         empty: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>`,
     };
@@ -577,12 +654,31 @@
         entregue: { label: "Entregue", cls: "badge-entregue", icon: ICONS.check },
     };
 
+    // ===== Ordenação =====
+    function ordenarLista(arr) {
+        const copia = [...arr];
+        switch (ordenacao) {
+            case "data-asc":
+                copia.sort((a, b) => (a.data > b.data ? 1 : a.data < b.data ? -1 : 0));
+                break;
+            case "data-desc":
+                copia.sort((a, b) => (a.data < b.data ? 1 : a.data > b.data ? -1 : 0));
+                break;
+            case "cliente-asc":
+                copia.sort((a, b) =>
+                    a.cliente.localeCompare(b.cliente, "pt-BR", { sensitivity: "base" })
+                );
+                break;
+        }
+        return copia;
+    }
+
     // ===== Render =====
     function renderizar() {
-        const ordenadas = [...entregas].sort((a, b) => (a.data > b.data ? 1 : -1));
+        const ordenadas = ordenarLista(entregas);
         const filtradas = ordenadas.filter((e) => {
             if (filtroAtivo === "todos") return true;
-            return calcularStatus(e.data) === filtroAtivo;
+            return calcularStatus(e) === filtroAtivo;
         });
 
         if (filtradas.length === 0) {
@@ -596,12 +692,17 @@
                 </div>`;
         } else {
             lista.innerHTML = filtradas.map((e) => {
-                const statusKey = calcularStatus(e.data);
+                const statusKey = calcularStatus(e);
                 const meta = STATUS_META[statusKey];
                 const nomeSeguro = escapeHtml(e.cliente);
                 const dataFmt = formatarData(e.data);
+                const done = e.entregue === true;
+                const doneIcon = done ? ICONS.undo : ICONS.checkCircle;
+                const doneTitle = done ? "Marcar como não entregue" : "Marcar como entregue";
+                const doneAria = done ? `Reverter entrega de ${nomeSeguro}` : `Marcar entrega de ${nomeSeguro} como concluída`;
+
                 return `
-                    <div class="row" data-id="${e.id}">
+                    <div class="row ${done ? "is-done" : ""}" data-id="${e.id}">
                         <div class="cell-client">
                             <div class="avatar" aria-hidden="true">${escapeHtml(iniciais(e.cliente))}</div>
                             <span class="client-name" title="${nomeSeguro}">${nomeSeguro}</span>
@@ -614,7 +715,20 @@
                             <span class="badge ${meta.cls}">${meta.icon}${meta.label}</span>
                         </div>
                         <div class="cell-action">
-                            <button type="button" class="btn-icon" data-action="delete" data-id="${e.id}" aria-label="Excluir entrega de ${nomeSeguro}" title="Excluir">
+                            <button type="button"
+                                    class="btn-icon btn-done ${done ? "is-done" : ""}"
+                                    data-action="toggle-done"
+                                    data-id="${e.id}"
+                                    title="${doneTitle}"
+                                    aria-label="${doneAria}">
+                                ${doneIcon}
+                            </button>
+                            <button type="button"
+                                    class="btn-icon"
+                                    data-action="delete"
+                                    data-id="${e.id}"
+                                    title="Excluir"
+                                    aria-label="Excluir entrega de ${nomeSeguro}">
                                 ${ICONS.trash}
                             </button>
                         </div>
@@ -622,9 +736,10 @@
             }).join("");
         }
 
+        // Estatísticas
         const contagem = { pendente: 0, hoje: 0, atrasado: 0, entregue: 0 };
         entregas.forEach((e) => {
-            const s = calcularStatus(e.data);
+            const s = calcularStatus(e);
             if (contagem[s] !== undefined) contagem[s]++;
         });
         stats.total.textContent = entregas.length;
@@ -640,6 +755,7 @@
             id: Date.now() + Math.floor(Math.random() * 1000),
             cliente: cliente.trim(),
             data: data,
+            entregue: false,
         });
         salvar();
         renderizar();
@@ -647,6 +763,14 @@
 
     function remover(id) {
         entregas = entregas.filter((e) => e.id !== id);
+        salvar();
+        renderizar();
+    }
+
+    function alternarEntregue(id) {
+        const item = entregas.find((e) => e.id === id);
+        if (!item) return;
+        item.entregue = !item.entregue;
         salvar();
         renderizar();
     }
@@ -674,11 +798,13 @@
     });
 
     lista.addEventListener("click", (ev) => {
-        const btn = ev.target.closest('[data-action="delete"]');
+        const btn = ev.target.closest("[data-action]");
         if (!btn) return;
         const id = Number(btn.dataset.id);
         if (!Number.isFinite(id)) return;
-        remover(id);
+        const action = btn.dataset.action;
+        if (action === "delete") remover(id);
+        else if (action === "toggle-done") alternarEntregue(id);
     });
 
     filtroBtns.forEach((btn) => {
@@ -692,6 +818,11 @@
             filtroAtivo = btn.dataset.filter;
             renderizar();
         });
+    });
+
+    selectOrdenar.addEventListener("change", () => {
+        ordenacao = selectOrdenar.value;
+        renderizar();
     });
 
     btnLimparTudo.addEventListener("click", limparTudo);
